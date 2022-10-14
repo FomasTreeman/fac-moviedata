@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Data</title>
+    <link rel="stylesheet" href="index.css">
+</head>
+
+<body>
+    <div class="container">
+        <header> Movie Data </header>
+        <div class="dropdown">
+            <button class="dropbtn">filter</button>
+            <div class="dropdown-content">
+                <a href="#">Alphabetical Asc</a>
+                <a href="#">Alphabetical Desc</a>
+                <a href="#">Year Asc</a>
+                <a href="#">Year Desc</a>
+                <a href="#">Rating Asc</a>
+                <a href="#">Rating Desc</a>
+                <a href="#">Runtime Asc</a>
+                <a href="#">Runtime Desc</a>
+            </div>
+        </div>
+    </div>
+    <div id="movies">
+
+    </div>
+    <script>
+        let alphOrderAsc = [0, 2, 3, 1];
+        let yearOrderAsc = [1, 0, 2, 3];
+        let rateOrderAsc = [0, 1, 2, 3];
+
+        let movieData = {
+            "The Darjeeling Limited": {
+                plot: "A year after their father's funeral, three brothers travel across India by train in an attempt to bond with each other.",
+                cast: ["Jason Schwartzman", "Owen Wilson", "Adrien Brody"],
+                runtime: 151,
+                rating: 7.2,
+                year: 2007,
+            },
+            "The Royal Tenenbaums": {
+                plot: "The eccentric members of a dysfunctional family reluctantly gather under the same roof for various reasons",
+                rating: 7.6,
+                year: 2001,
+                cast: ["Gene Hackman", "Gwnyeth Paltrow", "Anjelica Huston"],
+                runtime: 170,
+            },
+            "Fantastic Mr. Fox": {
+                year: 2009,
+                plot: "An urbane fox cannot resist returning to his farm raiding ways and then must help his community survive the farmers' retaliation.",
+                cast: [
+                    "George Clooney",
+                    "Meryl Streep",
+                    "Bill Murray",
+                    "Jason Schwartzman",
+                ],
+                runtime: 147,
+                rating: 7.9,
+            },
+            "The Grand Budapest Hotel": {
+                rating: 8.1,
+                runtime: 159,
+                year: 2014,
+                plot: "A writer encounters the owner of an aging high-class hotel, who tells him of his early years serving as a lobby boy in the hotel's glorious years under an exceptional concierge.",
+                cast: ["Ralph Fiennes", "F. Murray Abraham", "Mathieu Amalric"],
+            },
+        };
+
+        // cast selection
+
+        // add movie
+
+        // loop 
+        for (const key in movieData) {
+            console.log(key)
+            let infoKey = movieData[key];
+            let movieEntry = document.createElement("div");
+            movieEntry.setAttribute("class", "card")
+            let movieTitle = document.createElement("p");
+            let movieInfo = document.createElement("ul");
+            let rating = document.createElement("li");
+            let cast = document.createElement("li");
+            let runtime = document.createElement("li");
+            let year = document.createElement("li");
+            let plot = document.createElement("li");
+            movieTitle.innerHTML = key;
+            plot.innerHTML = "plot: " + infoKey["plot"];
+            year.innerHTML = "year: " + infoKey["year"];
+            runtime.innerHTML = "runtime: " + infoKey["runtime"] + "min";
+            rating.innerHTML = "rating: " + infoKey["rating"];
+            cast.innerHTML = "cast: " + infoKey["cast"];
+            movieEntry.appendChild(movieTitle);
+            movieEntry.appendChild(movieInfo);
+            movieEntry.appendChild(plot);
+            movieEntry.appendChild(year);
+            movieEntry.appendChild(runtime);
+            movieEntry.appendChild(rating);
+            movieEntry.appendChild(cast);
+            let movies = document.getElementById("movies");
+            movies.appendChild(movieEntry);
+        }
+    </script>
+</body>
+
+</html>
