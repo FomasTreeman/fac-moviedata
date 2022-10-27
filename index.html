@@ -15,29 +15,47 @@
         <div class="dropdown">
             <button class="dropbtn">filter</button>
             <div class="dropdown-content">
-                <a href="#">Alphabetical Asc</a>
-                <a href="#">Alphabetical Desc</a>
-                <a href="#">Year Asc</a>
-                <a href="#">Year Desc</a>
-                <a href="#">Rating Asc</a>
-                <a href="#">Rating Desc</a>
-                <a href="#">Runtime Asc</a>
-                <a href="#">Runtime Desc</a>
+                <a onclick="reorder(alphOrderAsc.reverse());" href="#">Alphabetical</a>
+                <a onclick="reorder(yearOrderAsc.reverse());" href="#">Year</a>
+                <a onclick="reorder(rateOrderAsc.reverse());" href="#">Rating</a>
+                <a onclick="reorder(timeOrderAsc.reverse());" href="#">Runtime</a>
             </div>
         </div>
     </div>
     <div id="movies">
-
+        <div class="inputForm">
+            <form>
+                <label for="title">Movie title:</label><br>
+                <input type="text" id="title" name="title"><br>
+                <label for="plot">Plot:</label><br>
+                <input type="text" id="plot" name="plot"><br>
+                <label for="year">Year:</label><br>
+                <input type="text" id="year" name="year"><br>
+                <label for="runtime">Runtime:</label><br>
+                <input type="text" id="runtime" name="runtime"><br>
+                <label for="rating">Rating:</label><br>
+                <input type="text" id="rating" name="rating"><br>
+                <label for="cast">Cast:</label><br>
+                <input type="text" id="cast" name="cast"><br>
+                <button onClick="addMovie()" type="button"> Submit </button>
+            </form>
+        </div>
     </div>
     <script>
-        let alphOrderAsc = [0, 2, 3, 1];
-        let yearOrderAsc = [1, 0, 2, 3];
-        let rateOrderAsc = [0, 1, 2, 3];
+        // [The Dar..., The Roal...., Fantastic..., The Grand...]
+        const alphOrderAsc = [0, 3, 1, 2];
+        const yearOrderAsc = [1, 0, 2, 3];
+        const rateOrderAsc = [0, 1, 2, 3];
+        const timeOrderAsc = [1, 3, 0, 2];
 
         let movieData = {
             "The Darjeeling Limited": {
                 plot: "A year after their father's funeral, three brothers travel across India by train in an attempt to bond with each other.",
-                cast: ["Jason Schwartzman", "Owen Wilson", "Adrien Brody"],
+                cast: [
+                    "Jason Schwartzman",
+                    "Owen Wilson",
+                    "Adrien Brody"
+                ],
                 runtime: 151,
                 rating: 7.2,
                 year: 2007,
@@ -46,7 +64,11 @@
                 plot: "The eccentric members of a dysfunctional family reluctantly gather under the same roof for various reasons",
                 rating: 7.6,
                 year: 2001,
-                cast: ["Gene Hackman", "Gwnyeth Paltrow", "Anjelica Huston"],
+                cast: [
+                    "Gene Hackman",
+                    "Gwnyeth Paltrow",
+                    "Anjelica Huston"
+                ],
                 runtime: 170,
             },
             "Fantastic Mr. Fox": {
@@ -66,27 +88,53 @@
                 runtime: 159,
                 year: 2014,
                 plot: "A writer encounters the owner of an aging high-class hotel, who tells him of his early years serving as a lobby boy in the hotel's glorious years under an exceptional concierge.",
-                cast: ["Ralph Fiennes", "F. Murray Abraham", "Mathieu Amalric"],
+                cast: [
+                    "Ralph Fiennes",
+                    "F. Murray Abraham",
+                    "Mathieu Amalric"
+                ],
             },
         };
 
         // cast selection
 
         // add movie
+        function addMovie() {
+            let form = document.getElementsByTagName("form");
+            const data = new FormData(form[0]);
+            console.log(data.get("title"));
+            movieTitle = data.get("title");
+            console.log(movieTitle);
+            newMovieInfo = {};
+            data.forEach((value, key) => { if (key !== "title") newMovieInfo[key] = value });
+            movieData[movieTitle] = newMovieInfo;
 
-        // loop 
-        for (const key in movieData) {
-            console.log(key)
+            createCard(movieTitle);
+        }
+
+        function createList() {
+            for (const key in movieData) {
+                console.log(key)
+                createCard(key);
+            }
+        }
+
+        function createCard(key) {
             let infoKey = movieData[key];
             let movieEntry = document.createElement("div");
             movieEntry.setAttribute("class", "card")
             let movieTitle = document.createElement("p");
             let movieInfo = document.createElement("ul");
             let rating = document.createElement("li");
+            // rating.setAttribute("id", "rating");
             let cast = document.createElement("li");
+            // cast.setAttribute("id", "cast");
             let runtime = document.createElement("li");
+            // runtime.setAttribute("id", "runtime");
             let year = document.createElement("li");
+            // year.setAttribute("id", "year");
             let plot = document.createElement("li");
+            // plot.setAttribute("id", "plot");
             movieTitle.innerHTML = key;
             plot.innerHTML = "plot: " + infoKey["plot"];
             year.innerHTML = "year: " + infoKey["year"];
@@ -102,7 +150,31 @@
             movieEntry.appendChild(cast);
             let movies = document.getElementById("movies");
             movies.appendChild(movieEntry);
-        }
+        };
+
+        function reorder(order = null) {
+            if (order == null) {
+                createList()
+            } else {
+                const cards = document.getElementsByClassName("card");
+                console.log(cards);
+                Array.from(cards).forEach((element, index) => {
+                    element.setAttribute("style", "order: " + order[index])
+                }); {
+                }
+
+                // 
+                // potential but for aesthetics rather than clearing child nodes, just use css to move elements
+                // 
+
+                // const temp = document.createDocumentFragment();
+                // const container = document.getElementById("movies");
+                // for (let index in order) {temp.appendChild(cards[index])};
+                // container.appendChild(temp);
+            }
+        };
+
+        reorder();
     </script>
 </body>
 
