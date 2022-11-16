@@ -10,6 +10,7 @@
 </head>
 
 <body>
+    <div id="blur" style="display: none"></div>
     <div class="container">
         <header> Movie Data </header>
         <div class="dropdown">
@@ -23,23 +24,43 @@
         </div>
     </div>
     <div id="movies">
-        <div class="inputForm">
+        <div class="inputForm" style="order:1000">
+            <h1 style="margin-top: 0px"> Add a movie </h1>
             <form>
                 <label for="title">Movie title:</label><br>
-                <input type="text" id="title" name="title"><br>
+                <input type="text" id="ntitle" name="title"><br>
                 <label for="plot">Plot:</label><br>
-                <input type="text" id="plot" name="plot"><br>
+                <input type="text" id="nplot" name="plot"><br>
                 <label for="year">Year:</label><br>
-                <input type="text" id="year" name="year"><br>
+                <input type="text" id="nyear" name="year"><br>
                 <label for="runtime">Runtime:</label><br>
-                <input type="text" id="runtime" name="runtime"><br>
+                <input type="text" id="nruntime" name="runtime"><br>
                 <label for="rating">Rating:</label><br>
-                <input type="text" id="rating" name="rating"><br>
+                <input type="text" id="nrating" name="rating"><br>
                 <label for="cast">Cast:</label><br>
-                <input type="text" id="cast" name="cast"><br>
-                <button onClick="addMovie()" type="button"> Submit </button>
+                <input type="text" id="ncast" name="cast"><br>
+                <button onClick="addMovie()" type="button" class="btn"> Submit </button>
             </form>
         </div>
+    </div>
+    <div class="form-popup" id="editForm">
+        <h1 id="movieTitle" style="padding-bottom: 0.5rem"> </h1>
+        <form class="form-container">
+            <form>
+                <label for="plot">Plot</label><br>
+                <input type="text" id="uplot" name="plot"><br>
+                <label for="year">Year</label><br>
+                <input type="text" id="uyear" name="year"><br>
+                <label for="runtime">Runtime</label><br>
+                <input type="text" id="uruntime" name="runtime"><br>
+                <label for="rating">Rating</label><br>
+                <input type="text" id="urating" name="rating"><br>
+                <label for="cast">Cast</label><br>
+                <input type="text" id="ucast" name="cast"><br>
+                <button type="button" class="form-btn" onclick="updateMovie()">Make changes</button>
+                <button type="button" class="form-btn cancel" onclick="closeForm()">Close</button>
+            </form>
+        </form>
     </div>
     <script>
         // [The Dar..., The Roal...., Fantastic..., The Grand...]
@@ -102,9 +123,7 @@
         function addMovie() {
             let form = document.getElementsByTagName("form");
             const data = new FormData(form[0]);
-            console.log(data.get("title"));
             movieTitle = data.get("title");
-            console.log(movieTitle);
             newMovieInfo = {};
             data.forEach((value, key) => { if (key !== "title") newMovieInfo[key] = value });
             movieData[movieTitle] = newMovieInfo;
@@ -112,9 +131,29 @@
             createCard(movieTitle);
         }
 
+        function updateMovie() {
+            let form = document.getElementsByTagName("form");
+            const data = new FormData(form[1]);
+            title = document.getElementById("movieTitle").innerHTML;
+            let oldData = movieData[title];
+            data.forEach((value, key) => { if (value !== oldData[key]) oldData[key] = value });
+            console.log(movieData[title]);
+            updateCard(title);
+            closeForm();
+        }
+
+        function updateCard(title) {
+            let card = document.getElementById(title);
+            movieInfo = movieData[title];
+            for (const key in movieInfo) {
+                let index = 2;
+                card.childNodes[index].innerHTML = movieInfo[key];
+                index++;
+            };
+        }
+
         function createList() {
             for (const key in movieData) {
-                console.log(key)
                 createCard(key);
             }
         }
@@ -123,6 +162,8 @@
             let infoKey = movieData[key];
             let movieEntry = document.createElement("div");
             movieEntry.setAttribute("class", "card")
+            movieEntry.setAttribute("style", "order: 0")
+            movieEntry.setAttribute("id", key);
             let movieTitle = document.createElement("p");
             let movieInfo = document.createElement("ul");
             let rating = document.createElement("li");
@@ -135,12 +176,16 @@
             // year.setAttribute("id", "year");
             let plot = document.createElement("li");
             // plot.setAttribute("id", "plot");
+            let edit = document.createElement("button");
+            edit.setAttribute("class", "btn")
+            edit.setAttribute("onclick", "openForm('" + key + "')");
             movieTitle.innerHTML = key;
             plot.innerHTML = "plot: " + infoKey["plot"];
             year.innerHTML = "year: " + infoKey["year"];
             runtime.innerHTML = "runtime: " + infoKey["runtime"] + "min";
             rating.innerHTML = "rating: " + infoKey["rating"];
             cast.innerHTML = "cast: " + infoKey["cast"];
+            edit.innerHTML = "edit";
             movieEntry.appendChild(movieTitle);
             movieEntry.appendChild(movieInfo);
             movieEntry.appendChild(plot);
@@ -148,16 +193,40 @@
             movieEntry.appendChild(runtime);
             movieEntry.appendChild(rating);
             movieEntry.appendChild(cast);
+            movieEntry.appendChild(edit);
             let movies = document.getElementById("movies");
             movies.appendChild(movieEntry);
         };
+
+
+        // IMPROVEMENT  toggle rather than two functions
+        function openForm(key) {
+            document.getElementById("editForm").style.display = "block";
+            document.getElementById("blur").style.display = 'block';
+            setPlaceholders(key)
+        }
+
+        function closeForm() {
+            document.getElementById("editForm").style.display = "none";
+            document.getElementById("blur").style.display = 'none';
+        }
+
+        function setPlaceholders(key) {
+            let data = movieData[key];
+            console.log(key)
+            document.getElementById("movieTitle").innerHTML = key;
+            document.getElementById("uplot").setAttribute("value", data["plot"]);
+            document.getElementById("uyear").setAttribute("value", data["year"]);
+            document.getElementById("uruntime").setAttribute("value", data["runtime"]);
+            document.getElementById("urating").setAttribute("value", data["rating"]);
+            document.getElementById("ucast").setAttribute("value", data["cast"]);
+        }
 
         function reorder(order = null) {
             if (order == null) {
                 createList()
             } else {
                 const cards = document.getElementsByClassName("card");
-                console.log(cards);
                 Array.from(cards).forEach((element, index) => {
                     element.setAttribute("style", "order: " + order[index])
                 }); {
