@@ -145,57 +145,60 @@
         function updateCard(title) {
             let card = document.getElementById(title);
             movieInfo = movieData[title];
-            for (const key in movieInfo) {
-                let index = 2;
-                card.childNodes[index].innerHTML = movieInfo[key];
-                index++;
-            };
+            const plot = document.getElementById(title + ".plot");
+            plot.innerHTML = "plot: " + movieInfo.plot;
+            const year = document.getElementById(title + ".year");
+            year.innerHTML = "plot: " + movieInfo.year;
+            const runtime = document.getElementById(title + ".runtime");
+            runtime.innerHTML = "plot: " + movieInfo.runtime;
+            const rating = document.getElementById(title + ".rating");
+            rating.innerHTML = "plot: " + movieInfo.rating;
+            const cast = document.getElementById(title + ".cast");
+            cast.innerHTML = "plot: " + movieInfo.cast;
+            // let index = 2;
+            // for (const key in movieInfo) {
+            //     console.log(index);
+            //     console.log(card.childNodes[index]);
+            //     card.childNodes[index].innerHTML = movieInfo[key];
+            //     index++;
+            // };
+
         }
-        
+
         function createList() {
             for (const key in movieData) {
                 createCard(key);
             }
         }
 
-        function createCard(key) {
-            let infoKey = movieData[key];
-            let movieEntry = document.createElement("div");
-            movieEntry.setAttribute("class", "card")
-            movieEntry.setAttribute("style", "order: 0")
-            movieEntry.setAttribute("id", key);
-            let movieTitle = document.createElement("p");
-            let movieInfo = document.createElement("ul");
-            let rating = document.createElement("li");
-            // rating.setAttribute("id", "rating");
-            let cast = document.createElement("li");
-            // cast.setAttribute("id", "cast");
-            let runtime = document.createElement("li");
-            // runtime.setAttribute("id", "runtime");
-            let year = document.createElement("li");
-            // year.setAttribute("id", "year");
-            let plot = document.createElement("li");
-            // plot.setAttribute("id", "plot");
-            let edit = document.createElement("button");
-            edit.setAttribute("class", "btn")
-            edit.setAttribute("onclick", "openForm('" + key + "')");
-            movieTitle.innerHTML = key;
-            plot.innerHTML = "plot: " + infoKey["plot"];
-            year.innerHTML = "year: " + infoKey["year"];
-            runtime.innerHTML = "runtime: " + infoKey["runtime"] + "min";
-            rating.innerHTML = "rating: " + infoKey["rating"];
-            cast.innerHTML = "cast: " + infoKey["cast"];
-            edit.innerHTML = "edit";
-            movieEntry.appendChild(movieTitle);
-            movieEntry.appendChild(movieInfo);
-            movieEntry.appendChild(plot);
-            movieEntry.appendChild(year);
-            movieEntry.appendChild(runtime);
-            movieEntry.appendChild(rating);
-            movieEntry.appendChild(cast);
-            movieEntry.appendChild(edit);
-            let movies = document.getElementById("movies");
-            movies.appendChild(movieEntry);
+        function createCard(title) {
+            let movieJson = movieData[title];
+            let movieElement = document.createElement("div");
+            movieElement.setAttribute("class", "card")
+            movieElement.setAttribute("style", "order: 0")
+            movieElement.setAttribute("id", title);
+            let titleElement = document.createElement("p");
+            let movieInfoElement = document.createElement("ul");
+            movieElement.appendChild(titleElement);
+            movieElement.appendChild(movieInfoElement);
+
+            for (const [key, value] of Object.entries(movieJson)) {
+                if (key !== "title") {
+                    let element = document.createElement("li");
+                    element.setAttribute("id", title + "." + key);
+                    element.innerHTML = key + ": " + value;
+                    movieElement.appendChild(element);
+                }
+            };
+
+            let editElement = document.createElement("button");
+            editElement.setAttribute("class", "btn")
+            editElement.setAttribute("onclick", "openForm('" + title + "')");
+            titleElement.innerHTML = title;
+            editElement.innerHTML = "edit";
+            movieElement.appendChild(editElement);
+            let moviesElement = document.getElementById("movies");
+            moviesElement.appendChild(movieElement);
         };
 
 
@@ -203,7 +206,7 @@
         function openForm(key) {
             document.getElementById("editForm").style.display = "block";
             document.getElementById("blur").style.display = 'block';
-            setPlaceholders(key)
+            populateForm(key)
         }
 
         function closeForm() {
@@ -211,15 +214,19 @@
             document.getElementById("blur").style.display = 'none';
         }
 
-        function setPlaceholders(key) {
-            let data = movieData[key];
+        function populateForm(key) {
+            let movieJson = movieData[key];
             console.log(key)
+            for (const [key, value] of Object.entries(movieJson)) {
+                
+            }
+
             document.getElementById("movieTitle").innerHTML = key;
-            document.getElementById("uplot").setAttribute("value", data["plot"]);
-            document.getElementById("uyear").setAttribute("value", data["year"]);
-            document.getElementById("uruntime").setAttribute("value", data["runtime"]);
-            document.getElementById("urating").setAttribute("value", data["rating"]);
-            document.getElementById("ucast").setAttribute("value", data["cast"]);
+            document.getElementById("uplot").setAttribute("value", movieJson["plot"]);
+            document.getElementById("uyear").setAttribute("value", movieJson["year"]);
+            document.getElementById("uruntime").setAttribute("value", movieJson["runtime"]);
+            document.getElementById("urating").setAttribute("value", movieJson["rating"]);
+            document.getElementById("ucast").setAttribute("value", movieJson["cast"]);
         }
 
         function reorder(order = null) {
