@@ -14,12 +14,13 @@
     <div class="container">
         <header> Movie Data </header>
         <div class="dropdown">
+            <a id="filterMethod"> </a>
             <button class="dropbtn">filter</button>
             <div class="dropdown-content">
-                <a onclick="reorder(alphOrderAsc.reverse());" href="#">Alphabetical</a>
-                <a onclick="reorder(yearOrderAsc.reverse());" href="#">Year</a>
-                <a onclick="reorder(rateOrderAsc.reverse());" href="#">Rating</a>
-                <a onclick="reorder(timeOrderAsc.reverse());" href="#">Runtime</a>
+                <a onclick="reorder2('title');" href="#">Alphabetical</a>
+                <a onclick="reorder2('year');" href="#">Year</a>
+                <a onclick="reorder2('rating');" href="#">Rating</a>
+                <a onclick="reorder2('runtime');" href="#">Runtime</a>
             </div>
         </div>
     </div>
@@ -64,10 +65,12 @@
     </div>
     <script>
         // [The Dar..., The Roal...., Fantastic..., The Grand...]
-        const alphOrderAsc = [0, 3, 1, 2];
-        const yearOrderAsc = [1, 0, 2, 3];
-        const rateOrderAsc = [0, 1, 2, 3];
-        const timeOrderAsc = [1, 3, 0, 2];
+        // const alphOrderAsc = [0, 3, 1, 2];
+        // const yearOrderAsc = [1, 0, 2, 3];
+        // const rateOrderAsc = [0, 1, 2, 3];
+        // const timeOrderAsc = [1, 3, 0, 2];
+        var filterMethod = "";
+        var asc = true;
 
         let movieData = {
             "The Darjeeling Limited": {
@@ -127,7 +130,7 @@
             newMovieInfo = {};
             data.forEach((value, key) => { if (key !== "title") newMovieInfo[key] = value });
             movieData[movieTitle] = newMovieInfo;
-
+            reorder(filterMethod, true);
             createCard(movieTitle);
         }
 
@@ -137,7 +140,6 @@
             title = document.getElementById("movieTitle").innerHTML;
             let oldData = movieData[title];
             data.forEach((value, key) => { if (value !== oldData[key]) oldData[key] = value });
-            console.log(movieData[title]);
             updateCard(title);
             closeForm();
         }
@@ -148,17 +150,15 @@
             const plot = document.getElementById(title + ".plot");
             plot.innerHTML = "plot: " + movieInfo.plot;
             const year = document.getElementById(title + ".year");
-            year.innerHTML = "plot: " + movieInfo.year;
+            year.innerHTML = "year: " + movieInfo.year;
             const runtime = document.getElementById(title + ".runtime");
-            runtime.innerHTML = "plot: " + movieInfo.runtime;
+            runtime.innerHTML = "runtime: " + movieInfo.runtime;
             const rating = document.getElementById(title + ".rating");
-            rating.innerHTML = "plot: " + movieInfo.rating;
+            rating.innerHTML = "rating: " + movieInfo.rating;
             const cast = document.getElementById(title + ".cast");
-            cast.innerHTML = "plot: " + movieInfo.cast;
+            cast.innerHTML = "cast: " + movieInfo.cast;
             // let index = 2;
             // for (const key in movieInfo) {
-            //     console.log(index);
-            //     console.log(card.childNodes[index]);
             //     card.childNodes[index].innerHTML = movieInfo[key];
             //     index++;
             // };
@@ -182,14 +182,16 @@
             movieElement.appendChild(titleElement);
             movieElement.appendChild(movieInfoElement);
 
-            for (const [key, value] of Object.entries(movieJson)) {
-                if (key !== "title") {
-                    let element = document.createElement("li");
+            // [title, plot, ] hard list to search movie data 
+            const orderOfInfo = ["plot", "year", "runtime", "rating", "cast"]; 
+            orderOfInfo.forEach(key => {
+                let value = Object.entries(movieJson).filter(array => array.includes(key));
+                value = value[0][1];
+                let element = document.createElement("li");
                     element.setAttribute("id", title + "." + key);
                     element.innerHTML = key + ": " + value;
                     movieElement.appendChild(element);
-                }
-            };
+            });
 
             let editElement = document.createElement("button");
             editElement.setAttribute("class", "btn")
@@ -216,10 +218,9 @@
 
         function populateForm(key) {
             let movieJson = movieData[key];
-            console.log(key)
-            for (const [key, value] of Object.entries(movieJson)) {
-                
-            }
+            // for (const [key, value] of Object.entries(movieJson)) {
+
+            // }
 
             document.getElementById("movieTitle").innerHTML = key;
             document.getElementById("uplot").setAttribute("value", movieJson["plot"]);
@@ -229,15 +230,26 @@
             document.getElementById("ucast").setAttribute("value", movieJson["cast"]);
         }
 
-        function reorder(order = null) {
-            if (order == null) {
+        function reorder(orderBy = "start", newMovie = false) {
+            let order = [...Array(Object.keys(movieData).length).keys()];
+            if (orderBy == "start") {
                 createList()
             } else {
+                if (filterMethod == orderBy && newMovie == false) {
+                    order.forEach((element, index) => order[index] = (order.length) - element);
+                    asc = !asc;
+                } else {
+                    getOrder(orderBy, order);
+                }
                 const cards = document.getElementsByClassName("card");
                 Array.from(cards).forEach((element, index) => {
-                    element.setAttribute("style", "order: " + order[index])
+                    element.setAttribute("style", "order: " + (order[index]))
                 }); {
                 }
+                filterMethod = orderBy;
+                const filterMethodElement = document.getElementById("filterMethod");
+                asc ? filterMethodElement.innerHTML = filterMethod + ' ascending' : filterMethodElement.innerHTML = filterMethod + ' descending';
+
 
                 // 
                 // potential but for aesthetics rather than clearing child nodes, just use css to move elements
@@ -249,6 +261,106 @@
                 // container.appendChild(temp);
             }
         };
+
+        function reorder2(orderBy = "start", newMovie = false) {
+            if (orderBy == "start") {
+                createList()
+            } else {
+                if (filterMethod == orderBy && newMovie == false) {
+                    asc = !asc;
+                }
+                sorted = sortMovies(orderBy, asc);
+                sorted.forEach((movie, index) => {
+                    const card = document.getElementById(movie[0]);
+                    card.setAttribute("style", "order: " + index);
+                })
+                filterMethod = orderBy;
+                const filterMethodElement = document.getElementById("filterMethod");
+                asc ? filterMethodElement.innerHTML = filterMethod + ' ascending' : filterMethodElement.innerHTML = filterMethod + ' descending';
+
+
+                // 
+                // potential but for aesthetics rather than clearing child nodes, just use css to move elements
+                // 
+
+                // const temp = document.createDocumentFragment();
+                // const container = document.getElementById("movies");
+                // for (let index in order) {temp.appendChild(cards[index])};
+                // container.appendChild(temp);
+            }
+        };
+        function sortMovies(orderBy, asc) {
+            switch (orderBy) {
+                case "title":
+                    var array = Object.entries(movieData);
+                    return array.sort((a, b) => {
+                        splitTitleA = a[0].split(" ");
+                        splitTitleA[0].toUpperCase() == "THE" ? value1 = splitTitleA[1] : value1 = a[0];
+                        splitTitleB = b[0].split(" ");
+                        splitTitleB[0].toUpperCase() == "THE" ? value2 = splitTitleB[1] : value2 = b[0];
+                        if (value1 > value2) {
+                            return asc ? 1 : -1;
+                        } else if (value1 < value2) {
+                            return asc ? -1 : 1;
+                        } else {
+                            return 0;
+                        }
+                    });
+                default:
+                    var array = Object.entries(movieData);
+                    return array.sort((a, b) => {
+                        value1 = a[1][orderBy];
+                        value2 = b[1][orderBy];
+                        console.log(value1, value2);
+                        if (value1 > value2) {
+                            return asc ? 1 : -1;
+                        } else if (value1 < value2) {
+                            return asc ? -1 : 1;
+                        } else {
+                            return 0;
+                        }
+                    });
+            }
+        }
+        function getOrder(orderBy, order) {
+            switch (orderBy) {
+                case "title":
+                    // order keys of moviedata
+                    break;
+                default:
+                    var array = Object.entries(movieData);
+                    order = array.sort((a, b) => {
+                        value1 = a[1][orderBy];
+                        value2 = b[1][orderBy];
+                        if (value1 > value2) {
+                            return -1;
+                        } else if (value1 < value2) {
+                            return 1;
+                        } else {
+                            return 0;
+                        }
+                    });
+                    for (let i = 0; i < array.length; i++) {
+                        console.log("hi 1");
+                        for (let j = 0; j < array.length - i - 1; j++) {
+                            console.log("hi 2");
+
+                            if (array[j + 1][1][orderBy] < array[j][1][orderBy]) {
+                                console.log(array[j + 1]);
+                                [array[j + 1], array[j]] = [array[j], array[j + 1]];
+                                console.log(array[j + 1]);
+
+                                // let temp = array[j + 1];
+                                // array[j + 1] = [array[j]];
+                                // array[j] = temp;
+                                [order[j + 1], order[j]] = [order[j], order[j + 1]];
+                            }
+
+                        }
+                    }
+            }
+
+        }
 
         reorder();
     </script>

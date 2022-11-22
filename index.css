@@ -179,3 +179,7 @@ li {
 .open-button:hover {
     opacity: 1;
 }
+
+#filterMethod {
+    padding-right: 1rem;
+}
